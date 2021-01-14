@@ -6,11 +6,9 @@ DEBUG = True
 INSTALLED_APPS = (
     'capone.tests',
     'capone',
-    'django.contrib.staticfiles',
     'django.contrib.sessions',
     'django.contrib.contenttypes',
     'django.contrib.auth',
-    'django.contrib.admin',
 )
 
 SECRET_KEY = 'secretkey'
@@ -30,17 +28,9 @@ DATABASES = {
 
 ALLOWED_HOSTS = []
 
-STATIC_FILE_FINDERS = (
-    "django.contrib.staticfiles.finders.FileSystemFinder",
-    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-)
-
-STATIC_URL = '/static/'
-
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 )
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
