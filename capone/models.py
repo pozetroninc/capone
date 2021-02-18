@@ -303,7 +303,6 @@ class Ledger(models.Model):
     """
     name = models.CharField(
         help_text=_("Name of this ledger"),
-        unique=True,
         max_length=255)
     number = models.PositiveIntegerField(
         help_text=_("Unique numeric identifier for this ledger"),
