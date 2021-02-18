@@ -306,7 +306,9 @@ class Ledger(models.Model):
         max_length=255)
     number = models.PositiveIntegerField(
         help_text=_("Unique numeric identifier for this ledger"),
-        unique=True)
+        unique=True,
+        null=True
+    )
     description = models.TextField(
         help_text=_("Any notes to go along with this Transaction."),
         blank=True)
