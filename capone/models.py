@@ -3,6 +3,7 @@ import uuid
 from decimal import Decimal
 from enum import Enum
 from functools import reduce
+from six import python_2_unicode_compatible
 
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -10,8 +11,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Q
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from capone.exceptions import TransactionBalanceException
 
@@ -37,9 +37,12 @@ class TransactionRelatedObject(models.Model):
 
     transaction = models.ForeignKey(
         'Transaction',
+        on_delete=models.CASCADE,
         related_name='related_objects')
     related_object_content_type = models.ForeignKey(
-        ContentType)
+        ContentType,
+        on_delete=models.SET_NULL,
+        null=True)
     related_object_id = models.PositiveIntegerField(
         db_index=True)
     related_object = GenericForeignKey(
@@ -227,13 +230,17 @@ class Transaction(models.Model):
         'Transaction',
         blank=True,
         null=True,
-        related_name='voided_by')
+        related_name='voided_by',
+        on_delete=models.CASCADE)
 
     notes = models.TextField(
         help_text=_("Any notes to go along with this Transaction."),
         blank=True)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL)
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True
+    )
     posted_timestamp = models.DateTimeField(
         help_text=_("Time the transaction was posted.  Change this field to model retroactive ledger entries."),  # noqa: E501
         db_index=True)
@@ -245,6 +252,8 @@ class Transaction(models.Model):
     type = models.ForeignKey(
         TransactionType,
         default=get_or_create_manual_transaction_type_id,
+        on_delete=models.SET_NULL,
+        null=True
     )
 
     objects = TransactionQuerySet.as_manager()
@@ -294,11 +303,12 @@ class Ledger(models.Model):
     """
     name = models.CharField(
         help_text=_("Name of this ledger"),
-        unique=True,
         max_length=255)
     number = models.PositiveIntegerField(
         help_text=_("Unique numeric identifier for this ledger"),
-        unique=True)
+        unique=True,
+        null=True
+    )
     description = models.TextField(
         help_text=_("Any notes to go along with this Transaction."),
         blank=True)
@@ -333,9 +343,11 @@ class LedgerEntry(models.Model):
 
     ledger = models.ForeignKey(
         Ledger,
-        related_name='entries')
+        related_name='entries',
+        on_delete=models.CASCADE)
     transaction = models.ForeignKey(
         Transaction,
+        on_delete=models.CASCADE,
         related_name='entries')
 
     entry_id = models.UUIDField(
@@ -378,10 +390,13 @@ class LedgerBalance(models.Model):
         )
 
     ledger = models.ForeignKey(
-        'Ledger')
+        'Ledger',
+        on_delete=models.CASCADE)
 
     related_object_content_type = models.ForeignKey(
-        ContentType)
+        ContentType,
+        on_delete=models.SET_NULL,
+        null=True)
     related_object_id = models.PositiveIntegerField(
         db_index=True)
     related_object = GenericForeignKey(
