@@ -1,4 +1,6 @@
+import sqlite3
 from django.db import connection
+from django.db.utils import OperationalError
 
 REBUILD_LEDGER_BALANCES_SQL = '''\
 SELECT 1 FROM capone_ledger ORDER BY id FOR UPDATE;
@@ -43,5 +45,16 @@ def rebuild_ledger_balances():
     example after data migrations which change historical transactions.
     """
     cursor = connection.cursor()
-    cursor.execute(REBUILD_LEDGER_BALANCES_SQL)
+    try:
+        cursor.execute(REBUILD_LEDGER_BALANCES_SQL)
+    except (sqlite3.Warning, sqlite3.OperationalError, OperationalError):
+        # Possibly an sqlite3 incompatibility
+        # - sqlite3 requires use of executescript() for multi-statement SQL
+        # - FOR UPDATE is not supported
+        # - TRUNCATE is not supported and can be replaced with DELETE FROM
+        cursor.executescript(
+            REBUILD_LEDGER_BALANCES_SQL
+            .replace(' FOR UPDATE', '')
+            .replace('TRUNCATE', 'DELETE FROM')
+        )
     cursor.close()
