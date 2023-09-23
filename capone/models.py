@@ -271,10 +271,15 @@ class Transaction(models.Model):
         Instead, the only check that makes sense is that the entries for the
         transaction still balance.
         """
-        total = sum([entry.amount for entry in self.entries.all()])
-        if total != Decimal(0):
-            raise TransactionBalanceException(
-                "Credits do not equal debits. Mis-match of %s." % total)
+
+        # If this is a new transaction, it's already been validated by
+        # `capone.api.queries.validate_transaction`. If it's an existing
+        # transaction, we only need to check that the entries still balance.
+        if self.pk:
+            total = sum([entry.amount for entry in self.entries.all()])
+            if total != Decimal(0):
+                raise TransactionBalanceException(
+                    "Credits do not equal debits. Mis-match of %s." % total)
         return True
 
     def save(self, **kwargs):
