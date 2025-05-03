@@ -1,8 +1,18 @@
 include AUTHORS
 include LICENSE
-include README.md
+include README.rst
 include requirements*.txt
+
+# Include package data if not automatically handled by include_package_data=True
+# and package discovery. Usually recursive-include is needed for data within packages.
+# Assuming static/templates are *not* inside the 'capone' package dir itself.
+# If they are, use 'recursive-include capone/static *', etc.
+# If they are top-level dirs, use 'recursive-include static *', etc.
+# Based on the original MANIFEST.in, they seem to be inside 'capone'.
 recursive-include capone/static *
 recursive-include capone/templates *
-prune capone/tests
-exclude Makefile
+
+# Exclude unnecessary files from the sdist
+global-exclude *.py[cod] __pycache__ *.so *.dylib .DS_Store
+# Exclude test files if they are included by mistake (find: should exclude them)
+# recursive-exclude capone/tests *

@@ -1,6 +1,4 @@
 from setuptools import setup
 
-setup(
-    setup_requires=['pbr'],
-    pbr=True,
-)
+# All configuration is in setup.cfg and pyproject.toml
+setup()

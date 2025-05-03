@@ -1,0 +1,13 @@
+# PEP 518 build system specification
+[build-system]
+requires = [
+    "setuptools>=61.0", # Minimum version supporting pyproject.toml fully
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+# Optional: Project metadata (PEP 621) can also go here instead of setup.cfg
+# [project]
+# name = "capone"
+# version = "1.0.0"
+# ... etc

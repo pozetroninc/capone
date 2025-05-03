@@ -1,4 +1,4 @@
-# Requirements needed for the setup make target and the test target
-# outside of the individual tox environments.
-
-tox==3.14.6
+# Setup requirements are now defined in pyproject.toml [build-system].requires
+# This file might no longer be needed, depending on Makefile usage.
+# Keeping it empty for now.
+# tox is a test runner, not a setup requirement.
